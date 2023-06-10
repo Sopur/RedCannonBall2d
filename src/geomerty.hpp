@@ -1,40 +1,95 @@
 #pragma once
 
+#include <cmath>
+#include <iostream>
+#include <math.h>
+
+#define IMMOVABLE_MASS 999999.0f
+
 namespace RedCannonBall {
     typedef float PhysAttr;
+    typedef unsigned long PhysID;
 
     enum class EntityType {
         Circle,
-        Rectangle,
-        Mesh
     };
+
+    PhysAttr lerp(PhysAttr a, PhysAttr b, PhysAttr x) {
+        return a + x * (b - a);
+    }
 
     class Vector2d {
     public:
         PhysAttr x;
         PhysAttr y;
 
-        Vector2d(void) = default;
-        Vector2d(PhysAttr x);
-        Vector2d(PhysAttr x, PhysAttr y);
+        Vector2d():
+            x(0),
+            y(0) {}
+        Vector2d(PhysAttr x):
+            x(x),
+            y(x) {}
+        Vector2d(PhysAttr x, PhysAttr y):
+            x(x),
+            y(y) {}
 
-        Vector2d copy(void);
+        Vector2d operator+(Vector2d vec) {
+            return Vector2d(x + vec.x, y + vec.y);
+        }
+        Vector2d operator+=(Vector2d vec) {
+            x += vec.x;
+            y += vec.y;
+            return *this;
+        }
 
-        Vector2d operator+(Vector2d vec);
-        Vector2d operator+=(Vector2d vec);
-        Vector2d operator-(Vector2d vec);
-        Vector2d operator-=(Vector2d vec);
-        Vector2d operator*(Vector2d vec);
-        Vector2d operator*=(Vector2d vec);
-        Vector2d operator/(Vector2d vec);
-        Vector2d operator/=(Vector2d vec);
+        Vector2d operator-(Vector2d vec) {
+            return Vector2d(x - vec.x, y - vec.y);
+        }
+        Vector2d operator-=(Vector2d vec) {
+            x -= vec.x;
+            y -= vec.y;
+            return *this;
+        }
 
-        PhysAttr angleTo(Vector2d vec);
-        PhysAttr distance(Vector2d vec);
-        Vector2d distanceXY(Vector2d vec);
+        Vector2d operator*(Vector2d vec) {
+            return Vector2d(x * vec.x, y * vec.y);
+        }
+        Vector2d operator*=(Vector2d vec) {
+            x *= vec.x;
+            y *= vec.y;
+            return *this;
+        }
 
-        void zero(void);
-        void lerpTo(Vector2d to, PhysAttr x);
+        Vector2d operator/(Vector2d vec) {
+            return Vector2d(x / vec.x, y / vec.y);
+        }
+        Vector2d operator/=(Vector2d vec) {
+            x /= vec.x;
+            y /= vec.y;
+            return *this;
+        }
+
+        Vector2d project2d(Vector2d origin, PhysAttr fov, PhysAttr screenWidth, PhysAttr screenHeight) {
+            return Vector2d((x - origin.x) * fov + screenWidth / 2, (y - origin.y) * fov + screenHeight / 2);
+        }
+
+        void lerpTo(Vector2d to, PhysAttr x) {
+            x = lerp(x, to.x, x);
+            y = lerp(y, to.y, y);
+        }
+
+        void zero(void) {
+            x = 0;
+            y = 0;
+        }
+
+        bool isZero(void) {
+            return x + y == 0;
+        }
+
+        void print() {
+            std::cout << "{ " << x << ", " << y << " }\n";
+        }
     };
 
     class Bound2d: public Vector2d {
@@ -42,36 +97,90 @@ namespace RedCannonBall {
         PhysAttr width;
         PhysAttr height;
 
-        Bound2d(PhysAttr x, PhysAttr y, PhysAttr width, PhysAttr height);
+        Bound2d(PhysAttr x, PhysAttr y, PhysAttr width, PhysAttr height):
+            Vector2d(x, y),
+            width(width),
+            height(height) {}
 
-        void align(void);
+        void align(void) {
+            x += -width / 2;
+            y += -height / 2;
+        }
     };
 
     class Circle: public Vector2d {
     public:
         PhysAttr radius;
 
-        Circle(PhysAttr x, PhysAttr y, PhysAttr radius);
+        Circle(PhysAttr x, PhysAttr y, PhysAttr radius):
+            Vector2d(x, y),
+            radius(radius) {}
 
-        operator Bound2d();
+        operator Bound2d() {
+            PhysAttr r2 = radius * 2;
+            return Bound2d(x, y, r2, r2);
+        }
     };
 
     class PhysicsObject: public Vector2d {
     public:
-        PhysAttr rotation;
         PhysAttr mass;
+        PhysAttr rotation;
+        PhysAttr restitution;
+        PhysAttr friction;
+        PhysAttr angularVel;
         Vector2d velocity;
-        Vector2d acceleration;
         Vector2d force;
-        Vector2d angularVel;
-        Vector2d angularAccel;
-        Vector2d angularForce;
+        PhysAttr invMass;
+        bool isMoveable;
 
-        PhysicsObject(PhysAttr x, PhysAttr y, PhysAttr mass);
+        PhysicsObject(PhysAttr x, PhysAttr y, PhysAttr mass, PhysAttr rotation, PhysAttr restitution, PhysAttr friction):
+            Vector2d(x, y),
+            mass(mass),
+            rotation(rotation),
+            restitution(restitution),
+            friction(friction),
+            angularVel(0) {
+            if (mass == 0) {
+                mass = IMMOVABLE_MASS;
+                isMoveable = false;
+            } else {
+                isMoveable = true;
+            }
+            invMass = 1 / mass;
+        }
 
-        PhysicsObject copy(void);
+        void applyForce(Vector2d vec) {
+            force += vec;
+        }
+        void resetForce(void) {
+            force.zero();
+        }
+    };
 
-        void applyForce(Vector2d vec);
-        void resetForce(void);
+    class Entity: public PhysicsObject {
+    public:
+        const PhysID id;
+        const EntityType type;
+
+        // Circle shape case
+        PhysAttr radius;
+
+        Entity(PhysAttr mass, PhysAttr rotation, PhysAttr restitution, PhysAttr friction, EntityType type, PhysID id):
+            id(id),
+            type(type),
+            PhysicsObject(0, 0, mass, rotation, restitution, friction) {}
+        Entity(PhysAttr mass, PhysAttr restitution, PhysAttr friction, Circle circle, PhysID id):
+            id(id),
+            type(EntityType::Circle),
+            PhysicsObject(0, 0, mass, 0, restitution, friction) {
+            setProperties(circle);
+        }
+
+        void setProperties(Circle& circle) {
+            x = circle.x;
+            y = circle.y;
+            radius = circle.radius;
+        }
     };
 } // namespace RedCannonBall
