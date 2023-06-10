@@ -1,20 +1,13 @@
 #pragma once
 #include "./geomerty.hpp"
+#include "collision.hpp"
 #include <vector>
 
 namespace RedCannonBall {
-    struct Settings {
-        PhysAttr gravity;
-    };
-
-    struct World {
-        Settings settings;
-        std::vector<Entity> entities;
-    };
-
     class Engine {
     private:
         PhysID nextID;
+        CollisionHandler collisions;
 
     public:
         World world;

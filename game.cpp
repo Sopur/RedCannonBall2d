@@ -3,13 +3,13 @@
 #include "src/render.hpp"
 
 int main() {
-    RedCannonBall::Renderer engine("Physics sim", 900, 900, {1}, RedCannonBall::Vector2d(0), 1);
-    engine.engine.insertEntity(RedCannonBall::Circle(0, 120, 200), 0, 1, 0.1);
-    engine.engine.insertEntity(RedCannonBall::Circle(-100, -300, 50), 10, 1, 0.1);
-    engine.engine.insertEntity(RedCannonBall::Circle(-100, -310, 50), 10, 1, 0.1);
-    engine.engine.insertEntity(RedCannonBall::Circle(-100, -320, 50), 10, 1, 0.1);
-    engine.engine.insertEntity(RedCannonBall::Circle(-100, -330, 50), 10, 1, 0.1);
-    engine.run([&engine] {
-        engine.fov -= 0.001;
+    RedCannonBall::PhysAttr timeStep = 1;
+    RedCannonBall::Renderer engine("Physics sim", 700, 700, {1, timeStep}, RedCannonBall::Vector2d(0), 0.2);
+    engine.engine.insertEntity(RedCannonBall::Circle(0, 1500, 1600), 0, 0.5, 0.1);
+    for (int i = 0; i < 1000; i++) {
+        engine.engine.insertEntity(RedCannonBall::Circle(-500, -300 - (100 * i), 30), 10, 1, 0.1);
+    }
+    engine.run(int(1 / timeStep), [&engine] {
+        // engine.fov -= 0.001;
     });
 }

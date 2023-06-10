@@ -1,10 +1,12 @@
 #include "engine.hpp"
+#include "collision.cpp"
 #include "collision.hpp"
 #include "geomerty.hpp"
 
 RedCannonBall::Engine::Engine(Settings settings):
     nextID(0),
-    world({settings, {}}) {}
+    world({settings, {}}),
+    collisions(world) {}
 RedCannonBall::Engine::~Engine() {}
 
 void RedCannonBall::Engine::iteration() {
@@ -14,16 +16,17 @@ void RedCannonBall::Engine::iteration() {
 
         for (auto& entityB : world.entities) {
             if (entity.id == entityB.id) continue;
-            auto collision = CollisionHandler::collisionMap[int(entity.type)][int(entityB.type)](entity, entityB);
+
+            auto collision = collisions.test(entity, entityB);
             if (collision.isIntersecting) {
-                CollisionHandler::solveMap[int(entity.type)][int(entityB.type)](entity, entityB, collision);
+                collisions.solve(entity, entityB, collision);
             }
         }
 
-        // This is a rlly shitty implementation :skull:
+        // Euler's method
         Vector2d acceleration = entity.force / Vector2d(entity.mass);
-        entity.velocity += acceleration;
-        entity += entity.velocity;
+        entity.velocity += acceleration * world.settings.timeStep;
+        entity += entity.velocity * world.settings.timeStep;
 
         entity.resetForce();
     }

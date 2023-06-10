@@ -3,15 +3,16 @@
 #include <cmath>
 #include <iostream>
 #include <math.h>
+#include <vector>
 
 #define IMMOVABLE_MASS 999999.0f
 
 namespace RedCannonBall {
-    typedef float PhysAttr;
+    typedef double PhysAttr;
     typedef unsigned long PhysID;
 
-    enum class EntityType {
-        Circle,
+    enum EntityType {
+        Entity_Circle,
     };
 
     PhysAttr lerp(PhysAttr a, PhysAttr b, PhysAttr x) {
@@ -71,6 +72,10 @@ namespace RedCannonBall {
 
         Vector2d project2d(Vector2d origin, PhysAttr fov, PhysAttr screenWidth, PhysAttr screenHeight) {
             return Vector2d((x - origin.x) * fov + screenWidth / 2, (y - origin.y) * fov + screenHeight / 2);
+        }
+
+        PhysAttr sum() {
+            return x + y;
         }
 
         void lerpTo(Vector2d to, PhysAttr x) {
@@ -172,7 +177,7 @@ namespace RedCannonBall {
             PhysicsObject(0, 0, mass, rotation, restitution, friction) {}
         Entity(PhysAttr mass, PhysAttr restitution, PhysAttr friction, Circle circle, PhysID id):
             id(id),
-            type(EntityType::Circle),
+            type(EntityType::Entity_Circle),
             PhysicsObject(0, 0, mass, 0, restitution, friction) {
             setProperties(circle);
         }
@@ -182,5 +187,15 @@ namespace RedCannonBall {
             y = circle.y;
             radius = circle.radius;
         }
+    };
+
+    struct Settings {
+        PhysAttr gravity;
+        PhysAttr timeStep;
+    };
+
+    struct World {
+        Settings settings;
+        std::vector<Entity> entities;
     };
 } // namespace RedCannonBall

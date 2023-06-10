@@ -26,7 +26,8 @@ namespace RedCannonBall {
             SetTargetFPS(60);
         }
 
-        void run(std::function<void()> onFrame) {
+        void run(int iterationsPerFrame, std::function<void()> onFrame) {
+            std::cout << iterationsPerFrame << "\n";
             while (!WindowShouldClose()) {
                 onFrame();
                 BeginDrawing();
@@ -36,7 +37,7 @@ namespace RedCannonBall {
                     auto projected = entity.project2d(camera, fov, screen.width, screen.height);
 
                     switch (entity.type) {
-                    case EntityType::Circle: {
+                    case EntityType::Entity_Circle: {
                         DrawCircle(projected.x, projected.y, entity.radius * fov, RED);
                         break;
                     }
@@ -44,7 +45,7 @@ namespace RedCannonBall {
                 }
 
                 EndDrawing();
-                engine.iteration();
+                engine.iteration(iterationsPerFrame);
             }
             CloseWindow();
         }
