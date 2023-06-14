@@ -1,6 +1,8 @@
 #pragma once
-#include "./geomerty.hpp"
 #include "collision.hpp"
+#include "geo-gen.hpp"
+#include "geomerty.hpp"
+#include "quadtree/tree.hpp"
 #include <vector>
 
 namespace RedCannonBall {
@@ -8,6 +10,7 @@ namespace RedCannonBall {
     private:
         PhysID nextID;
         CollisionHandler collisions;
+        QuadTree tree;
 
     public:
         World world;
@@ -21,6 +24,7 @@ namespace RedCannonBall {
         void staticIteration(World* world);        // Preform iterations on a specific world
         void staticIteration(World* world, int n); // Preform multiple iterations on a specific world
 
-        void insertEntity(Circle circle, PhysAttr mass, PhysAttr restitution, PhysAttr friction);
+        void insertEntity(Circle circle, PhysAttr mass, PhysAttr inertia, PhysAttr restitution, PhysAttr friction);
+        void insertEntity(Mesh lines, Vector2d position, PhysAttr mass, PhysAttr inertia, PhysAttr restitution, PhysAttr friction);
     };
 } // namespace RedCannonBall

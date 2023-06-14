@@ -5,6 +5,7 @@
 namespace RedCannonBall {
     struct CollisionResponse {
         bool isIntersecting;
+        Vector2d intersection;
         // In case ima add anything in the future...
     };
 
@@ -18,8 +19,12 @@ namespace RedCannonBall {
         CollisionResponse test(RedCannonBall::Entity& entity1, RedCannonBall::Entity& entity2);
         void solve(RedCannonBall::Entity& entity1, RedCannonBall::Entity& entity2, CollisionResponse& collision);
 
-        CollisionResponse testCircleCircle(RedCannonBall::Entity& circle1, RedCannonBall::Entity& circle2);
+        CollisionResponse testCircleCircle(RedCannonBall::Entity& entity1, RedCannonBall::Entity& entity2);
+        CollisionResponse testPolygonCircle(RedCannonBall::Entity& entity1, RedCannonBall::Entity& entity2);
+        CollisionResponse testPolygonPolygon(RedCannonBall::Entity& entity1, RedCannonBall::Entity& entity2);
 
-        void solveCircleCircle(RedCannonBall::Entity& circle1, RedCannonBall::Entity& circle2, CollisionResponse& collision);
+        void solveCircleCircle(RedCannonBall::Entity& entity1, RedCannonBall::Entity& entity2, CollisionResponse& collision);
+        void solvePolygonCircle(RedCannonBall::Entity& entity1, RedCannonBall::Entity& entity2, CollisionResponse& collision);
+        void solvePolygonPolygon(RedCannonBall::Entity& entity1, RedCannonBall::Entity& entity2, CollisionResponse& collision);
     };
 } // namespace RedCannonBall
