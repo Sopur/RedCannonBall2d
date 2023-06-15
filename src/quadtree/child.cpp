@@ -1,6 +1,7 @@
 #pragma once
 #include "child.hpp"
 #include "vec.hpp"
+#include <algorithm>
 #include <cstring>
 
 #define FIND_SECTOR(vec) \
@@ -53,10 +54,11 @@ void RedCannonBall::QuadTreeChild::split(int depth) {
     splits[1][1] = new QuadTreeChild(Bound2d(area.mid.x, area.mid.y, area.half.x, area.half.y), 0b11, newHold, holdIncrementor, depth, extendedDepth);
 
     if (contents != nullptr) {
+        int matrix = 0;
         for (int i = 0; i < maxHold; i++) {
             if (contents[i].id != QT_NULL_ID) {
-                QTMatrix matrix = {0};
-                insert(contents[i], matrix);
+                insert(contents[i], (QTMatrix&) matrix);
+                matrix = 0;
             }
         }
         delete[] contents;

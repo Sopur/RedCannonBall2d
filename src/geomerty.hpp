@@ -208,7 +208,7 @@ namespace RedCannonBall {
             Vector2d(x, y),
             width(width),
             height(height),
-            half({width / 2, height / 2}),
+            half({width * 0.5f, height * 0.5f}),
             mid({x + half.x, y + half.y}) {}
 
         // Centers the bound

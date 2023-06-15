@@ -10,25 +10,17 @@
 #include <utility>
 #include <vector>
 
-#define ARENA_WIDTH       10000000
-#define ARENA_HEIGHT      10000000
+#define ARENA_WIDTH       1000000
+#define ARENA_HEIGHT      1000000
 #define ENTITY_COUNT      100000
 #define ENTITY_SIZE_MIN_X 10
 #define ENTITY_SIZE_MIN_Y 10
-#define ENTITY_SIZE_MAX_X 10000
-#define ENTITY_SIZE_MAX_Y 10000
+#define ENTITY_SIZE_MAX_X 1000
+#define ENTITY_SIZE_MAX_Y 1000
 
 #define timeNow()     std::chrono::high_resolution_clock::now()
 #define durationMS()  float(std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count())
 #define durationMCS() float(std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count())
-
-void logSet(std::vector<RedCannonBall::QTID> data) {
-    std::stringstream output;
-    for (auto id : data) {
-        output << id << " ";
-    }
-    std::cout << "[" << data.size() << "]:\t{ " << output.str() << "}\n";
-}
 
 double randZeroToOne() {
     return std::rand() / (RAND_MAX + 1.);
@@ -40,7 +32,7 @@ double random(double min, double max) {
 
 int main() {
     // Log setup
-    auto seed = std::time(nullptr);
+    auto seed = 0; // std::time(nullptr);
     std::cout << "Setup:"
               << "\n\tArena width:\t" << ARENA_WIDTH
               << "\n\tArena height:\t" << ARENA_HEIGHT

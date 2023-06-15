@@ -2,6 +2,7 @@
 #include <cstddef>
 #include <cstdlib>
 #include <cstring>
+#include <iostream>
 #include <vector>
 #define IAL_VEC_PREALLOC_MUL  2
 #define IAL_VEC_PREALLOC_SIZE 8
@@ -15,8 +16,8 @@ private:
         realloc(trueSize);
     }
     void realloc(size_t amount) {
-        T* tempbuffer = (T*) malloc(amount * sizeof(T));
-        memcpy(tempbuffer, buffer, length * sizeof(T));
+        T* tempbuffer = (T*) std::malloc(amount * sizeof(T));
+        std::memcpy(tempbuffer, buffer, length * sizeof(T));
         free(buffer);
         buffer = tempbuffer;
     }
@@ -28,7 +29,7 @@ public:
     IALVector():
         trueSize(IAL_VEC_PREALLOC_SIZE),
         length(0) {
-        buffer = (T*) malloc(trueSize * sizeof(T));
+        buffer = (T*) std::malloc(trueSize * sizeof(T));
     }
 
     ~IALVector() {
@@ -43,7 +44,7 @@ public:
         return buffer[index];
     }
 
-    constexpr size_t size() const {
+    constexpr size_t size(void) const {
         return length;
     }
 
@@ -51,5 +52,9 @@ public:
         if (length == trueSize) reallign();
         buffer[length] = value;
         length++;
+    }
+
+    void clear(void) {
+        length = 0;
     }
 };
