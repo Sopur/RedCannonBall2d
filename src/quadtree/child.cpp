@@ -71,7 +71,9 @@ void RedCannonBall::QuadTreeChild::clear(void) {
         splits[1][1]->clear();
     } else {
         contentsUsed = 1;
-        std::memset(contents, 0, maxHold * sizeof(QTNode));
+        for (int i = 0; i < maxHold; i++) {
+            contents[i].id = QT_NULL_ID;
+        }
     }
 }
 

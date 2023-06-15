@@ -17,7 +17,7 @@ double random(double min, double max) {
 }
 
 int main() {
-    RedCannonBall::Renderer engine("Physics sim", 700, 700, {0, timeStep}, RedCannonBall::Vector2d(0), 0.1);
+    RedCannonBall::Renderer engine("Physics sim", 1000, 1000, {0, timeStep}, RedCannonBall::Vector2d(0), 0.1);
     // engine.engine.insertEntity(RedCannonBall::EntityGen::invPolygon(11, 200), {0, -300}, 999, 9999, 0.5, 0.01);
 
     // for (int i = 0; i < 1; i++) {
@@ -28,8 +28,8 @@ int main() {
     // engine.engine.insertEntity(RedCannonBall::EntityGen::polygon(6, 700), {0, 0}, 0, 10, 0.5, 0.01);
     engine.engine.insertEntity(RedCannonBall::Circle(0, 0, 3000), 100, 10, 1, 0.1);
 
-    for (int i = 0; i < 5000; i++) {
-        engine.engine.insertEntity(RedCannonBall::Circle(random(-90000, 90000), random(-90000, 90000), random(100, 2000)), 10, 10, 1, 0.1);
+    for (int i = 0; i < 10000; i++) {
+        engine.engine.insertEntity(RedCannonBall::Circle(random(-90000, 90000), random(-90000, 90000), random(100, 1000)), 10, 10, 1, 0.1);
     }
 
     // engine.engine.insertEntity(RedCannonBall::EntityGen::polygon(10, 10), {0, 300}, 10, 0.5, 1, 0.1);
