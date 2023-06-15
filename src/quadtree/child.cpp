@@ -1,10 +1,17 @@
 #pragma once
 #include "child.hpp"
+#include "vec.hpp"
 #include <cstring>
-#include <unordered_set>
 
 #define FIND_SECTOR(vec) \
     splits[(vec.x > area.mid.x)][(vec.y > area.mid.y)]
+
+void safePush(IALVector<RedCannonBall::QTID>& output, RedCannonBall::QTID id) {
+    for (int i = 0; i < output.size(); i++) {
+        if (output[i] == id) return;
+    }
+    output.push_back(id);
+}
 
 RedCannonBall::QuadTreeChild::QuadTreeChild(Bound2d area, const ChildIndex childIndex, int maxHold, int holdIncrementor, int initDepth, int extendedDepth):
     childIndex(childIndex),
@@ -113,7 +120,7 @@ void RedCannonBall::QuadTreeChild::remove(RedCannonBall::QTNode& node, QTMatrix&
         }
     }
 }
-void RedCannonBall::QuadTreeChild::get(std::unordered_set<RedCannonBall::QTID>& output, Box& box, QTMatrix& matrix) {
+void RedCannonBall::QuadTreeChild::get(IALVector<RedCannonBall::QTID>& output, Box& box, QTMatrix& matrix) {
     if (matrix[childIndex] == 1) return;
     matrix[childIndex] = 1;
 
@@ -126,12 +133,12 @@ void RedCannonBall::QuadTreeChild::get(std::unordered_set<RedCannonBall::QTID>& 
     } else {
         for (int i = 0; i < maxHold; i++) {
             if (contents[i].id != QT_NULL_ID) {
-                output.insert(contents[i].id);
+                safePush(output, contents[i].id);
             }
         }
     }
 }
-void RedCannonBall::QuadTreeChild::getAll(std::unordered_set<RedCannonBall::QTID>& output) {
+void RedCannonBall::QuadTreeChild::getAll(IALVector<RedCannonBall::QTID>& output) {
     if (hasSplit) {
         splits[0][0]->getAll(output);
         splits[1][0]->getAll(output);
@@ -140,7 +147,7 @@ void RedCannonBall::QuadTreeChild::getAll(std::unordered_set<RedCannonBall::QTID
     } else {
         for (int i = 0; i < maxHold; i++) {
             if (contents[i].id != QT_NULL_ID) {
-                output.insert(contents[i].id);
+                safePush(output, contents[i].id);
             }
         }
     }

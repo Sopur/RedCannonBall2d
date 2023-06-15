@@ -16,9 +16,9 @@ double random(double min, double max) {
     return randZeroToOne() * (max - min) + min;
 }
 
-#define ENTITY_AMOUNT   5000
-#define SPAWN_X         50000
-#define SPAWN_Y         50000
+#define ENTITY_AMOUNT   10000
+#define SPAWN_X         90000
+#define SPAWN_Y         90000
 #define ENTITY_SIZE_MIN 100
 #define ENTITY_SIZE_MAX 400
 

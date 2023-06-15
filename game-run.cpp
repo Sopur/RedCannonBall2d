@@ -3,10 +3,10 @@
 #include "src/geomerty.hpp"
 #include "src/render.hpp"
 
-RedCannonBall::PhysAttr movementSpeed = 150;
+RedCannonBall::PhysAttr movementSpeed = 200;
 RedCannonBall::PhysAttr cameraSpeed = 2;
 RedCannonBall::PhysAttr zoomSpeed = 0.005;
-RedCannonBall::PhysAttr timeStep = 0.5;
+RedCannonBall::PhysAttr timeStep = 1;
 
 double randZeroToOne() {
     return std::rand() / (RAND_MAX + 1.);
@@ -26,10 +26,10 @@ int main() {
     // engine.engine.insertEntity(RedCannonBall::Circle(0, 0, 30), 10, 1, 0.5, 0.01);
     //  engine.engine.insertEntity(RedCannonBall::EntityGen::invPolygon(5, 200), {0, 0}, 9999, 9999, 0.01, 0.01);
     // engine.engine.insertEntity(RedCannonBall::EntityGen::polygon(6, 700), {0, 0}, 0, 10, 0.5, 0.01);
-    engine.engine.insertEntity(RedCannonBall::Circle(0, 0, 1000), 50, 10, 1, 0.1);
+    engine.engine.insertEntity(RedCannonBall::Circle(0, 0, 3000), 100, 10, 1, 0.1);
 
     for (int i = 0; i < 5000; i++) {
-        engine.engine.insertEntity(RedCannonBall::Circle(random(-50000, 50000), random(-50000, 50000), random(100, 400)), 10, 10, 1, 0.1);
+        engine.engine.insertEntity(RedCannonBall::Circle(random(-90000, 90000), random(-90000, 90000), random(100, 2000)), 10, 10, 1, 0.1);
     }
 
     // engine.engine.insertEntity(RedCannonBall::EntityGen::polygon(10, 10), {0, 300}, 10, 0.5, 1, 0.1);
@@ -50,5 +50,7 @@ int main() {
         if (IsKeyDown(KEY_LEFT)) player.force.x -= movementSpeed;
         if (IsKeyDown(KEY_UP)) player.force.y -= movementSpeed;
         if (IsKeyDown(KEY_DOWN)) player.force.y += movementSpeed;
+
+        engine.camera.lerpTo(player, 0.05);
     });
 }

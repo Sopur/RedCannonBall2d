@@ -1,6 +1,6 @@
 #pragma once
 #include "../geomerty.hpp"
-#include <unordered_set>
+#include "vec.hpp"
 
 #define QT_NULL_ID 0
 
@@ -35,7 +35,7 @@ namespace RedCannonBall {
         void clear(void);
         void insert(RedCannonBall::QTNode& node, QTMatrix& matrix);
         void remove(RedCannonBall::QTNode& node, QTMatrix& matrix);
-        void get(std::unordered_set<RedCannonBall::QTID>& output, Box& area, QTMatrix& matrix);
-        void getAll(std::unordered_set<RedCannonBall::QTID>& output);
+        void get(IALVector<RedCannonBall::QTID>& output, Box& area, QTMatrix& matrix);
+        void getAll(IALVector<RedCannonBall::QTID>& output);
     };
 } // namespace RedCannonBall

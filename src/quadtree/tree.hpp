@@ -1,7 +1,7 @@
 #pragma once
 #include "../geomerty.hpp"
 #include "child.hpp"
-#include <unordered_set>
+#include "vec.hpp"
 
 namespace RedCannonBall {
     class QuadTree {
@@ -16,7 +16,7 @@ namespace RedCannonBall {
         void insert(Bound2d bound, QTID id);
         void remove(Bound2d location, QTID id);
         void move(Bound2d location, Bound2d newLocation, QTID id);
-        std::unordered_set<QTID> get(Bound2d area);
-        std::unordered_set<QTID> getAll(void);
+        IALVector<QTID> get(Bound2d area);
+        IALVector<QTID> getAll(void);
     };
 } // namespace RedCannonBall

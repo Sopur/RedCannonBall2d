@@ -47,7 +47,8 @@ void RedCannonBall::Engine::staticIteration(World* arena) {
         }
 
         auto possibleCollisions = tree.get(entity.getCircleNode(tree.area));
-        for (auto entityID : possibleCollisions) {
+        for (int i = 0; i < possibleCollisions.size(); i++) {
+            auto entityID = possibleCollisions[i];
             if (entity.id == entityID) continue;
             auto& entityB = world.entities[entityID - 1];
 

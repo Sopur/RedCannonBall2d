@@ -142,9 +142,9 @@ namespace RedCannonBall {
             return x + y;
         }
 
-        void lerpTo(Vector2d to, PhysAttr x) {
-            x = lerp(x, to.x, x);
-            y = lerp(y, to.y, y);
+        void lerpTo(Vector2d to, PhysAttr b) {
+            x = lerp(x, to.x, b);
+            y = lerp(y, to.y, b);
         }
 
         bool isZero() {

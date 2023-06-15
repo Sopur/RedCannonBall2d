@@ -10,13 +10,15 @@
 #include <utility>
 #include <vector>
 
-#define ARENA_WIDTH   100000
-#define ARENA_HEIGHT  100000
-#define ENTITY_COUNT  50
-#define ENTITY_SIZE_X 6
-#define ENTITY_SIZE_Y 6
-#define FETCH_SIZE_X  10
-#define FETCH_SIZE_Y  10
+#define ARENA_WIDTH       100000
+#define ARENA_HEIGHT      100000
+#define ENTITY_COUNT      10000
+#define ENTITY_SIZE_MIN_X 10
+#define ENTITY_SIZE_MIN_Y 10
+#define ENTITY_SIZE_MAX_X 1000
+#define ENTITY_SIZE_MAX_Y 1000
+#define FETCH_SIZE_X      10
+#define FETCH_SIZE_Y      10
 
 #define timeNow()  std::chrono::high_resolution_clock::now()
 #define duration() std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count()
@@ -33,8 +35,8 @@ double randZeroToOne() {
     return std::rand() / (RAND_MAX + 1.);
 }
 
-double random(int x) {
-    return randZeroToOne() * x;
+double random(double min, double max) {
+    return randZeroToOne() * (max - min) + min;
 }
 
 int main() {
@@ -43,33 +45,39 @@ int main() {
               << "\n\tArena width:\t" << ARENA_WIDTH
               << "\n\tArena height:\t" << ARENA_HEIGHT
               << "\n\tEntity count:\t" << ENTITY_COUNT
-              << "\n\tEntity size:\t" << ENTITY_SIZE_X << 'x' << ENTITY_SIZE_Y
+              << "\n\tMin size:\t" << ENTITY_SIZE_MIN_X << 'x' << ENTITY_SIZE_MIN_Y
+              << "\n\tMax size:\t" << ENTITY_SIZE_MAX_X << 'x' << ENTITY_SIZE_MAX_Y
               << "\n\tFetch size:\t" << FETCH_SIZE_X << 'x' << FETCH_SIZE_Y
               << "\n\tRandom seed:\t" << seed
               << "\n\n";
     std::srand(seed);
 
-    RedCannonBall::QuadTree qt(RedCannonBall::Vector2d(ARENA_WIDTH, ARENA_HEIGHT), 10, 3, 0);
+    RedCannonBall::QuadTree qt(RedCannonBall::Vector2d(ARENA_WIDTH, ARENA_HEIGHT), 10, 0, 0, 0);
 
-    RedCannonBall::Bound2d lastBound;
     auto t1 = timeNow();
     for (int i = 1; i < ENTITY_COUNT; i++) {
-        lastBound.x = random(qt.area.width);
-        lastBound.y = random(qt.area.height);
-        lastBound.width = ENTITY_SIZE_X;
-        lastBound.height = ENTITY_SIZE_Y;
-        qt.insert(lastBound, i);
+        qt.insert(RedCannonBall::Bound2d(
+                      random(ENTITY_SIZE_MAX_X, ARENA_WIDTH - ENTITY_SIZE_MAX_X),
+                      random(ENTITY_SIZE_MAX_Y, ARENA_HEIGHT - ENTITY_SIZE_MAX_Y),
+                      random(ENTITY_SIZE_MIN_X, ENTITY_SIZE_MAX_X),
+                      random(ENTITY_SIZE_MIN_Y, ENTITY_SIZE_MAX_Y)),
+            i);
     }
     auto t2 = timeNow();
-    std::cout << "Insert time: " << duration() << "ms\n";
+    std::cout << "Inserting " << ENTITY_COUNT << " entities: " << duration() << "ms\n";
 
     int entitiesFetched = 0;
     t1 = timeNow();
     for (int i = 0; i < ENTITY_COUNT; i++) {
-        entitiesFetched += qt.get(RedCannonBall::Bound2d(random(qt.area.width), random(qt.area.height), FETCH_SIZE_X, FETCH_SIZE_Y)).size();
+        entitiesFetched += qt.get(RedCannonBall::Bound2d(
+                                      random(FETCH_SIZE_X, ARENA_WIDTH - FETCH_SIZE_X),
+                                      random(FETCH_SIZE_Y, ARENA_HEIGHT - FETCH_SIZE_Y),
+                                      FETCH_SIZE_X,
+                                      FETCH_SIZE_Y))
+                               .size();
     }
     t2 = timeNow();
-    std::cout << "Fetch time: " << duration() << "ms\n";
-    std::cout << entitiesFetched << " entities were retrieved\n";
+    std::cout << "Fetching " << ENTITY_COUNT << " times: " << duration() << "ms\n";
+    std::cout << entitiesFetched << " entities (" << float(entitiesFetched) / float(ENTITY_COUNT) << " ent/fetch) were retrieved\n";
     return 0;
 }

@@ -2,7 +2,7 @@
 #include "tree.hpp"
 #include "child.cpp"
 #include "child.hpp"
-#include <unordered_set>
+#include "vec.hpp"
 
 RedCannonBall::QuadTree::QuadTree(RedCannonBall::Vector2d dimensions, int maxHold, int holdIncrementor, int initDepth, int childInitDepth):
     area(0, 0, dimensions.x, dimensions.y),
@@ -34,15 +34,15 @@ void RedCannonBall::QuadTree::move(Bound2d location, Bound2d newLocation, QTID i
     remove(location, id);
     insert(newLocation, id);
 }
-std::unordered_set<RedCannonBall::QTID> RedCannonBall::QuadTree::get(Bound2d area) {
-    std::unordered_set<RedCannonBall::QTID> output;
+IALVector<RedCannonBall::QTID> RedCannonBall::QuadTree::get(Bound2d area) {
+    IALVector<RedCannonBall::QTID> output;
     QTMatrix matrix = {0};
     Box square(area);
     root.get(output, square, matrix);
     return output;
 }
-std::unordered_set<RedCannonBall::QTID> RedCannonBall::QuadTree::getAll(void) {
-    std::unordered_set<RedCannonBall::QTID> output;
+IALVector<RedCannonBall::QTID> RedCannonBall::QuadTree::getAll(void) {
+    IALVector<RedCannonBall::QTID> output;
     root.getAll(output);
     return output;
 }
