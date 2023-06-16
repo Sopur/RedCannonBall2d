@@ -1,5 +1,6 @@
 #pragma once
 #include "engine.hpp"
+#include "../hsg.cpp"
 #include "collision.cpp"
 #include "collision.hpp"
 #include "geomerty.hpp"
@@ -11,7 +12,7 @@
 
 RedCannonBall::Engine::Engine(Settings settings):
     nextID(1),
-    tree(Vector2d(1000000), 10, 0, 0, 0),
+    tree(Vector2d(1000000)),
     world({settings, {}}),
     collisions(world) {}
 RedCannonBall::Engine::~Engine() {}
@@ -23,12 +24,8 @@ void RedCannonBall::Engine::iteration(int n) {
     staticIteration(&world, n);
 }
 
+auto area = RedCannonBall::Bound2d(0, 0, 1000000, 1000000);
 void RedCannonBall::Engine::staticIteration(World* arena) {
-    tree.clear();
-    for (auto& entity : arena->entities) {
-        tree.insert(entity.getCircleNode(tree.area), entity.id);
-    }
-
     for (auto& entity : arena->entities) {
         if (!entity.isMoveable) continue;
         Vector2d force = {0, world.settings.gravity};
@@ -46,7 +43,7 @@ void RedCannonBall::Engine::staticIteration(World* arena) {
             entity.updateLines();
         }
 
-        auto possibleCollisions = tree.get(entity.getCircleNode(tree.area));
+        auto possibleCollisions = tree.get(entity.bound);
         for (int i = 0; i < possibleCollisions.size(); i++) {
             auto entityID = possibleCollisions[i];
             if (entity.id == entityID) continue;
@@ -58,6 +55,10 @@ void RedCannonBall::Engine::staticIteration(World* arena) {
                 collisions.solve(entity, entityB, collision);
             }
         }
+
+        tree.remove(entity.bound, entity.id);
+        entity.bound = entity.getCircleNode(area);
+        tree.insert(entity.bound, entity.id);
     }
 }
 
@@ -69,7 +70,8 @@ void RedCannonBall::Engine::staticIteration(World* arena, int n) {
 
 void RedCannonBall::Engine::insertEntity(Circle circle, PhysAttr mass, PhysAttr inertia, PhysAttr restitution, PhysAttr friction) {
     auto entity = Entity(mass, inertia, restitution, friction, circle, nextID++);
-    tree.insert(entity.getCircleNode(tree.area), entity.id);
+    entity.bound = entity.getCircleNode(area);
+    tree.insert(entity.bound, entity.id);
     world.entities.push_back(entity);
 }
 

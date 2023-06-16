@@ -7,31 +7,15 @@
 #define FIND_SECTOR(vec) \
     splits[(vec.x > area.mid.x)][(vec.y > area.mid.y)]
 
-void safePush(IALVector<RedCannonBall::QTID>& output, RedCannonBall::QTID id) {
-    for (int i = 0; i < output.size(); i++) {
-        if (output[i] == id) return;
-    }
-    output.push_back(id);
-}
-
-RedCannonBall::QuadTreeChild::QuadTreeChild(Bound2d area, const ChildIndex childIndex, int maxHold, int holdIncrementor, int initDepth, int extendedDepth):
+RedCannonBall::QuadTreeChild::QuadTreeChild(Bound2d area, const ChildIndex childIndex):
     childIndex(childIndex),
-    area(area),
-    maxHold(maxHold),
-    holdIncrementor(holdIncrementor),
-    extendedDepth(extendedDepth) {
+    area(area) {
     if (area.width + area.height < 0.0001) {
         std::cerr << "QUADTREE ERROR: Attempted to split too much: ";
         area.print();
         exit(1);
     }
-    if (initDepth != 0) {
-        contents = nullptr;
-        split(initDepth - 1);
-        return;
-    }
     hasSplit = false;
-    contents = new QTNode[maxHold];
     clear();
 }
 RedCannonBall::QuadTreeChild::~QuadTreeChild() {
@@ -40,28 +24,22 @@ RedCannonBall::QuadTreeChild::~QuadTreeChild() {
         delete splits[1][0];
         delete splits[0][1];
         delete splits[1][1];
-    } else {
-        delete[] contents;
     }
 }
 
-void RedCannonBall::QuadTreeChild::split(int depth) {
+void RedCannonBall::QuadTreeChild::split() {
     hasSplit = true;
-    auto newHold = maxHold + holdIncrementor;
-    splits[0][0] = new QuadTreeChild(Bound2d(area.x, area.y, area.half.x, area.half.y), 0b00, newHold, holdIncrementor, depth, extendedDepth);
-    splits[1][0] = new QuadTreeChild(Bound2d(area.mid.x, area.y, area.half.x, area.half.y), 0b10, newHold, holdIncrementor, depth, extendedDepth);
-    splits[0][1] = new QuadTreeChild(Bound2d(area.x, area.mid.y, area.half.x, area.half.y), 0b01, newHold, holdIncrementor, depth, extendedDepth);
-    splits[1][1] = new QuadTreeChild(Bound2d(area.mid.x, area.mid.y, area.half.x, area.half.y), 0b11, newHold, holdIncrementor, depth, extendedDepth);
+    splits[0][0] = new QuadTreeChild(Bound2d(area.x, area.y, area.half.x, area.half.y), 0b00);
+    splits[1][0] = new QuadTreeChild(Bound2d(area.mid.x, area.y, area.half.x, area.half.y), 0b10);
+    splits[0][1] = new QuadTreeChild(Bound2d(area.x, area.mid.y, area.half.x, area.half.y), 0b01);
+    splits[1][1] = new QuadTreeChild(Bound2d(area.mid.x, area.mid.y, area.half.x, area.half.y), 0b11);
 
-    if (contents != nullptr) {
-        int matrix = 0;
-        for (int i = 0; i < maxHold; i++) {
-            if (contents[i].id != QT_NULL_ID) {
-                insert(contents[i], (QTMatrix&) matrix);
-                matrix = 0;
-            }
+    int matrix = 0;
+    for (int i = 0; i < QT_MAX_HOLD; i++) {
+        if (contents[i].id != QT_NULL_ID) {
+            insert(contents[i], (QTMatrix&) matrix);
+            matrix = 0;
         }
-        delete[] contents;
     }
 }
 
@@ -73,7 +51,7 @@ void RedCannonBall::QuadTreeChild::clear(void) {
         splits[1][1]->clear();
     } else {
         contentsUsed = 1;
-        for (int i = 0; i < maxHold; i++) {
+        for (int i = 0; i < QT_MAX_HOLD; i++) {
             contents[i].id = QT_NULL_ID;
         }
     }
@@ -90,7 +68,7 @@ void RedCannonBall::QuadTreeChild::insert(RedCannonBall::QTNode& node, QTMatrix&
         FIND_SECTOR(node.bound.bottomRight)->insert(node, insertMatrix);
         FIND_SECTOR(node.bound.bottomLeft)->insert(node, insertMatrix);
     } else {
-        for (int i = 0; i < maxHold; i++) {
+        for (int i = 0; i < QT_MAX_HOLD; i++) {
             if (contents[i].id == QT_NULL_ID) {
                 contents[i] = node;
                 contentsUsed++;
@@ -98,8 +76,8 @@ void RedCannonBall::QuadTreeChild::insert(RedCannonBall::QTNode& node, QTMatrix&
             }
         }
 
-        if (contentsUsed == maxHold) {
-            split(extendedDepth);
+        if (contentsUsed == QT_MAX_HOLD) {
+            split();
         }
     }
 }
@@ -115,7 +93,7 @@ void RedCannonBall::QuadTreeChild::remove(RedCannonBall::QTNode& node, QTMatrix&
         FIND_SECTOR(node.bound.bottomRight)->remove(node, removeMatrix);
         FIND_SECTOR(node.bound.bottomLeft)->remove(node, removeMatrix);
     } else {
-        for (int i = 0; i < maxHold; i++) {
+        for (int i = 0; i < QT_MAX_HOLD; i++) {
             if (contents[i].id == node.id) {
                 contents[i].id = QT_NULL_ID;
                 contentsUsed--;
@@ -135,9 +113,9 @@ void RedCannonBall::QuadTreeChild::get(IALVector<RedCannonBall::QTID>& output, B
         FIND_SECTOR(box.bottomRight)->get(output, box, getMatrix);
         FIND_SECTOR(box.bottomLeft)->get(output, box, getMatrix);
     } else {
-        for (int i = 0; i < maxHold; i++) {
+        for (int i = 0; i < QT_MAX_HOLD; i++) {
             if (contents[i].id != QT_NULL_ID) {
-                safePush(output, contents[i].id);
+                output.push_back(contents[i].id);
             }
         }
     }
@@ -149,9 +127,9 @@ void RedCannonBall::QuadTreeChild::getAll(IALVector<RedCannonBall::QTID>& output
         splits[0][1]->getAll(output);
         splits[1][1]->getAll(output);
     } else {
-        for (int i = 0; i < maxHold; i++) {
+        for (int i = 0; i < QT_MAX_HOLD; i++) {
             if (contents[i].id != QT_NULL_ID) {
-                safePush(output, contents[i].id);
+                output.push_back(contents[i].id);
             }
         }
     }

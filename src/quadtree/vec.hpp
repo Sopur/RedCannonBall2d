@@ -13,12 +13,20 @@ private:
     size_t trueSize;
     void reallign() {
         trueSize = length * IAL_VEC_PREALLOC_MUL;
-        realloc(trueSize);
+        grow(trueSize);
     }
-    void realloc(size_t amount) {
+
+    void grow(size_t amount) {
         T* tempbuffer = (T*) std::malloc(amount * sizeof(T));
         std::memcpy(tempbuffer, buffer, length * sizeof(T));
-        free(buffer);
+        std::free(buffer);
+        buffer = tempbuffer;
+    }
+
+    void shrink(size_t amount) {
+        T* tempbuffer = (T*) std::malloc(amount * sizeof(T));
+        std::memcpy(tempbuffer, buffer, amount * sizeof(T));
+        std::free(buffer);
         buffer = tempbuffer;
     }
 
@@ -46,10 +54,22 @@ public:
         return length;
     }
 
-    void push_back(T value) {
+    constexpr T* begin() {
+        return &buffer[0];
+    }
+
+    constexpr T* end() {
+        return &buffer[length];
+    }
+
+    inline void push_back(T value) {
         if (length == trueSize) reallign();
         buffer[length] = value;
         length++;
+    }
+
+    void slice(T* pos) {
+        length = pos - buffer; // Index diff
     }
 
     void clear(void) {

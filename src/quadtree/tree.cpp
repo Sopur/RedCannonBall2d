@@ -4,9 +4,14 @@
 #include "child.hpp"
 #include "vec.hpp"
 
-RedCannonBall::QuadTree::QuadTree(RedCannonBall::Vector2d dimensions, int maxHold, int holdIncrementor, int initDepth, int childInitDepth):
+void removeDup(IALVector<RedCannonBall::QTID>& vec) {
+    std::sort(vec.begin(), vec.end());
+    vec.slice(std::unique(vec.begin(), vec.end()));
+}
+
+RedCannonBall::QuadTree::QuadTree(RedCannonBall::Vector2d dimensions):
     area(0, 0, dimensions.x, dimensions.y),
-    root(area, 0b00, maxHold, holdIncrementor, initDepth, childInitDepth) {
+    root(area, 0b00) {
 }
 RedCannonBall::QuadTree::~QuadTree() {
     foundObjs.dealloc();
@@ -40,10 +45,12 @@ IALVector<RedCannonBall::QTID>& RedCannonBall::QuadTree::get(Bound2d area) {
     Box square(area);
     foundObjs.clear();
     root.get(foundObjs, square, matrix);
+    removeDup(foundObjs);
     return foundObjs;
 }
 IALVector<RedCannonBall::QTID>& RedCannonBall::QuadTree::getAll(void) {
     foundObjs.clear();
     root.getAll(foundObjs);
+    removeDup(foundObjs);
     return foundObjs;
 }

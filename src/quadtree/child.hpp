@@ -2,7 +2,8 @@
 #include "../geomerty.hpp"
 #include "vec.hpp"
 
-#define QT_NULL_ID 0
+#define QT_NULL_ID  0
+#define QT_MAX_HOLD 10
 
 namespace RedCannonBall {
     typedef unsigned long QTID;
@@ -17,21 +18,18 @@ namespace RedCannonBall {
     class QuadTreeChild {
     private:
         const ChildIndex childIndex;
-        QTNode* contents;
+        QTNode contents[QT_MAX_HOLD];
         int contentsUsed;
         QuadTreeChild* splits[2][2];
         bool hasSplit;
 
     public:
         Bound2d area;
-        int maxHold;
-        int holdIncrementor;
-        int extendedDepth;
 
-        QuadTreeChild(Bound2d area, const ChildIndex childIndex, int maxHold, int holdIncrementor, int initDepth, int extendedDepth);
+        QuadTreeChild(Bound2d area, const ChildIndex childIndex);
         ~QuadTreeChild();
 
-        void split(int depth);
+        void split();
         void clear(void);
         void insert(RedCannonBall::QTNode& node, QTMatrix& matrix);
         void remove(RedCannonBall::QTNode& node, QTMatrix& matrix);

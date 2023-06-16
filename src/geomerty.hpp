@@ -306,6 +306,7 @@ namespace RedCannonBall {
     public:
         const EntityType type;
         const PhysID id;
+        Bound2d bound;
 
         // Debug
         Vector2d collision;

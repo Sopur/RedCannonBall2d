@@ -12,7 +12,7 @@ namespace RedCannonBall {
         Bound2d area;
         QuadTreeChild root;
 
-        QuadTree(RedCannonBall::Vector2d dimensions, int maxHold = 10, int holdIncrementor = 1, int initDepth = 4, int childInitDepth = 0);
+        QuadTree(RedCannonBall::Vector2d dimensions);
         ~QuadTree();
 
         void clear(void);

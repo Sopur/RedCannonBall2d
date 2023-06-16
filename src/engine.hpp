@@ -1,7 +1,9 @@
 #pragma once
+#include "../hsg.cpp"
 #include "collision.hpp"
 #include "geo-gen.hpp"
 #include "geomerty.hpp"
+#include "quadtree/child.hpp"
 #include "quadtree/tree.hpp"
 #include <vector>
 
