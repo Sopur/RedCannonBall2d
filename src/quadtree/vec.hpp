@@ -32,9 +32,7 @@ public:
         buffer = (T*) std::malloc(trueSize * sizeof(T));
     }
 
-    ~IALVector() {
-        free(buffer);
-    }
+    ~IALVector() {}
 
     constexpr T& at(size_t index) {
         return buffer[index];
@@ -56,5 +54,9 @@ public:
 
     void clear(void) {
         length = 0;
+    }
+
+    void dealloc(void) {
+        std::free(buffer);
     }
 };

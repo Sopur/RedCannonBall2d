@@ -28,7 +28,7 @@ int main() {
     // engine.engine.insertEntity(RedCannonBall::EntityGen::polygon(6, 700), {0, 0}, 0, 10, 0.5, 0.01);
     engine.engine.insertEntity(RedCannonBall::Circle(0, 0, 3000), 100, 10, 1, 0.1);
 
-    for (int i = 0; i < 10000; i++) {
+    for (int i = 0; i < 5000; i++) {
         engine.engine.insertEntity(RedCannonBall::Circle(random(-90000, 90000), random(-90000, 90000), random(100, 1000)), 10, 10, 1, 0.1);
     }
 

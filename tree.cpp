@@ -12,11 +12,11 @@
 
 #define ARENA_WIDTH       1000000
 #define ARENA_HEIGHT      1000000
-#define ENTITY_COUNT      100000
+#define ENTITY_COUNT      10000
 #define ENTITY_SIZE_MIN_X 10
 #define ENTITY_SIZE_MIN_Y 10
-#define ENTITY_SIZE_MAX_X 1000
-#define ENTITY_SIZE_MAX_Y 1000
+#define ENTITY_SIZE_MAX_X 10000
+#define ENTITY_SIZE_MAX_Y 10000
 
 #define timeNow()     std::chrono::high_resolution_clock::now()
 #define durationMS()  float(std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count())
