@@ -25,7 +25,6 @@ void RedCannonBall::Engine::iteration(int n) {
     staticIteration(&world, n);
 }
 
-auto area = RedCannonBall::Bound2d(0, 0, 1000000, 1000000);
 void RedCannonBall::Engine::staticIteration(World* arena) {
     for (auto& entity : arena->entities) {
         if (!entity.isMoveable) continue;
@@ -45,7 +44,7 @@ void RedCannonBall::Engine::staticIteration(World* arena) {
         }
 
         tree.remove(entity.bound, entity.id);
-        entity.bound = entity.getCircleNode(area);
+        entity.bound = entity.getCircleNode(tree.area);
         tree.insert(entity.bound, entity.id);
     }
 
@@ -74,7 +73,7 @@ void RedCannonBall::Engine::staticIteration(World* arena, int n) {
 
 void RedCannonBall::Engine::insertEntity(Circle circle, PhysAttr mass, PhysAttr inertia, PhysAttr restitution, PhysAttr friction) {
     auto entity = Entity(mass, inertia, restitution, friction, circle, nextID++);
-    entity.bound = entity.getCircleNode(area);
+    entity.bound = entity.getCircleNode(tree.area);
     tree.insert(entity.bound, entity.id);
     world.entities.push_back(entity);
 }
