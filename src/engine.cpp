@@ -4,6 +4,7 @@
 #include "collision.cpp"
 #include "collision.hpp"
 #include "geomerty.hpp"
+#include "quadtree/child.hpp"
 #include "quadtree/tree.cpp"
 #include "quadtree/tree.hpp"
 #include <cstddef>
@@ -43,23 +44,26 @@ void RedCannonBall::Engine::staticIteration(World* arena) {
             entity.updateLines();
         }
 
-        auto possibleCollisions = tree.get(entity.bound);
-        for (int i = 0; i < possibleCollisions.size(); i++) {
-            auto entityID = possibleCollisions[i];
-            if (entity.id == entityID) continue;
-            auto& entityB = world.entities[entityID - 1];
-
-            auto collision = collisions.test(entity, entityB);
-            if (collision.isIntersecting) {
-                entity.collision = collision.intersection;
-                collisions.solve(entity, entityB, collision);
-            }
-        }
-
         tree.remove(entity.bound, entity.id);
         entity.bound = entity.getCircleNode(area);
         tree.insert(entity.bound, entity.id);
     }
+
+    tree.collisions([this](IALStaticVector<QTID, 10>& entityIDs) {
+        for (size_t i = 0; i < entityIDs.length; i++) {
+            auto& entityA = world.entities[entityIDs[i]];
+            for (size_t j = 0; j < entityIDs.length; j++) {
+                if (i == j) continue;
+                auto& entityB = world.entities[entityIDs[j]];
+
+                auto collision = collisions.test(entityA, entityB);
+                if (collision.isIntersecting) {
+                    entityA.collision = collision.intersection;
+                    collisions.solve(entityA, entityB, collision);
+                }
+            }
+        }
+    });
 }
 
 void RedCannonBall::Engine::staticIteration(World* arena, int n) {

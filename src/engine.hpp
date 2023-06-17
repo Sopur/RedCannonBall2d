@@ -12,7 +12,7 @@ namespace RedCannonBall {
     private:
         PhysID nextID;
         CollisionHandler collisions;
-        QuadTree tree;
+        QuadTree<10> tree;
 
     public:
         World world;

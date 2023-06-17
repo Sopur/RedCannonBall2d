@@ -4,10 +4,13 @@
 #include <algorithm>
 #include <cstring>
 
+#define ID_RETURN_OFFSET 1
+
 #define FIND_SECTOR(vec) \
     splits[(vec.x > area.mid.x)][(vec.y > area.mid.y)]
 
-RedCannonBall::QuadTreeChild::QuadTreeChild(Bound2d area, const ChildIndex childIndex):
+template <size_t QT_MAX_HOLD>
+RedCannonBall::QuadTreeChild<QT_MAX_HOLD>::QuadTreeChild(Bound2d area, const ChildIndex childIndex):
     childIndex(childIndex),
     area(area) {
     if (area.width + area.height < 0.0001) {
@@ -18,7 +21,9 @@ RedCannonBall::QuadTreeChild::QuadTreeChild(Bound2d area, const ChildIndex child
     hasSplit = false;
     clear();
 }
-RedCannonBall::QuadTreeChild::~QuadTreeChild() {
+
+template <size_t QT_MAX_HOLD>
+RedCannonBall::QuadTreeChild<QT_MAX_HOLD>::~QuadTreeChild() {
     if (hasSplit) {
         delete splits[0][0];
         delete splits[1][0];
@@ -27,7 +32,8 @@ RedCannonBall::QuadTreeChild::~QuadTreeChild() {
     }
 }
 
-void RedCannonBall::QuadTreeChild::split() {
+template <size_t QT_MAX_HOLD>
+void RedCannonBall::QuadTreeChild<QT_MAX_HOLD>::split() {
     hasSplit = true;
     splits[0][0] = new QuadTreeChild(Bound2d(area.x, area.y, area.half.x, area.half.y), 0b00);
     splits[1][0] = new QuadTreeChild(Bound2d(area.mid.x, area.y, area.half.x, area.half.y), 0b10);
@@ -43,7 +49,8 @@ void RedCannonBall::QuadTreeChild::split() {
     }
 }
 
-void RedCannonBall::QuadTreeChild::clear(void) {
+template <size_t QT_MAX_HOLD>
+void RedCannonBall::QuadTreeChild<QT_MAX_HOLD>::clear(void) {
     if (hasSplit) {
         splits[0][0]->clear();
         splits[1][0]->clear();
@@ -57,7 +64,8 @@ void RedCannonBall::QuadTreeChild::clear(void) {
     }
 }
 
-void RedCannonBall::QuadTreeChild::insert(RedCannonBall::QTNode& node, QTMatrix& matrix) {
+template <size_t QT_MAX_HOLD>
+void RedCannonBall::QuadTreeChild<QT_MAX_HOLD>::insert(RedCannonBall::QTNode& node, QTMatrix& matrix) {
     if (matrix[childIndex] == 1) return;
     matrix[childIndex] = 1;
 
@@ -82,7 +90,8 @@ void RedCannonBall::QuadTreeChild::insert(RedCannonBall::QTNode& node, QTMatrix&
     }
 }
 
-void RedCannonBall::QuadTreeChild::remove(RedCannonBall::QTNode& node, QTMatrix& matrix) {
+template <size_t QT_MAX_HOLD>
+void RedCannonBall::QuadTreeChild<QT_MAX_HOLD>::remove(RedCannonBall::QTNode& node, QTMatrix& matrix) {
     if (matrix[childIndex] == 1) return;
     matrix[childIndex] = 1;
 
@@ -102,7 +111,28 @@ void RedCannonBall::QuadTreeChild::remove(RedCannonBall::QTNode& node, QTMatrix&
         }
     }
 }
-void RedCannonBall::QuadTreeChild::get(IALVector<RedCannonBall::QTID>& output, Box& box, QTMatrix& matrix) {
+
+template <size_t QT_MAX_HOLD>
+void RedCannonBall::QuadTreeChild<QT_MAX_HOLD>::collisions(std::function<void(IALStaticVector<QTID, QT_MAX_HOLD>& collisions)>& callback) {
+    if (hasSplit) {
+        splits[0][0]->collisions(callback);
+        splits[1][0]->collisions(callback);
+        splits[0][1]->collisions(callback);
+        splits[1][1]->collisions(callback);
+    } else {
+        if (contentsUsed == 1) return;
+        IALStaticVector<QTID, QT_MAX_HOLD> collisions;
+        for (int i = 0; i < QT_MAX_HOLD; i++) {
+            if (contents[i].id != QT_NULL_ID) {
+                collisions.push_back(contents[i].id - ID_RETURN_OFFSET);
+            }
+        }
+        callback(collisions);
+    }
+}
+
+template <size_t QT_MAX_HOLD>
+void RedCannonBall::QuadTreeChild<QT_MAX_HOLD>::get(IALVector<RedCannonBall::QTID>& output, Box& box, QTMatrix& matrix) {
     if (matrix[childIndex] == 1) return;
     matrix[childIndex] = 1;
 
@@ -115,12 +145,14 @@ void RedCannonBall::QuadTreeChild::get(IALVector<RedCannonBall::QTID>& output, B
     } else {
         for (int i = 0; i < QT_MAX_HOLD; i++) {
             if (contents[i].id != QT_NULL_ID) {
-                output.push_back(contents[i].id);
+                output.push_back(contents[i].id - ID_RETURN_OFFSET);
             }
         }
     }
 }
-void RedCannonBall::QuadTreeChild::getAll(IALVector<RedCannonBall::QTID>& output) {
+
+template <size_t QT_MAX_HOLD>
+void RedCannonBall::QuadTreeChild<QT_MAX_HOLD>::getAll(IALVector<RedCannonBall::QTID>& output) {
     if (hasSplit) {
         splits[0][0]->getAll(output);
         splits[1][0]->getAll(output);
@@ -129,7 +161,7 @@ void RedCannonBall::QuadTreeChild::getAll(IALVector<RedCannonBall::QTID>& output
     } else {
         for (int i = 0; i < QT_MAX_HOLD; i++) {
             if (contents[i].id != QT_NULL_ID) {
-                output.push_back(contents[i].id);
+                output.push_back(contents[i].id - ID_RETURN_OFFSET);
             }
         }
     }

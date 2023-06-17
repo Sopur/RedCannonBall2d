@@ -20,7 +20,7 @@ double random(double min, double max) {
 #define SPAWN_X         90000
 #define SPAWN_Y         90000
 #define ENTITY_SIZE_MIN 100
-#define ENTITY_SIZE_MAX 400
+#define ENTITY_SIZE_MAX 1000
 
 int main() {
     RedCannonBall::Engine engine({0, 1});

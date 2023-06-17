@@ -44,7 +44,7 @@ int main() {
     std::srand(seed);
 
     // Initialize
-    RedCannonBall::QuadTree qt(RedCannonBall::Vector2d(ARENA_WIDTH, ARENA_HEIGHT));
+    RedCannonBall::QuadTree<10> qt(RedCannonBall::Vector2d(ARENA_WIDTH, ARENA_HEIGHT));
 
     // Generate entities
     std::vector<RedCannonBall::Bound2d> entities;

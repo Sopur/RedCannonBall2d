@@ -1,18 +1,17 @@
 #pragma once
+#include <algorithm>
 #include <cstddef>
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
 #include <vector>
-#define IAL_VEC_PREALLOC_MUL  2
-#define IAL_VEC_PREALLOC_SIZE 8
 
-template <typename T>
+template <typename T, size_t preallocSize = 10, size_t preallocMul = 2>
 class IALVector {
 private:
     size_t trueSize;
     void reallign() {
-        trueSize = length * IAL_VEC_PREALLOC_MUL;
+        trueSize = length * preallocMul;
         grow(trueSize);
     }
 
@@ -35,7 +34,7 @@ public:
     size_t length;
 
     IALVector():
-        trueSize(IAL_VEC_PREALLOC_SIZE),
+        trueSize(preallocSize),
         length(0) {
         buffer = (T*) std::malloc(trueSize * sizeof(T));
     }
@@ -68,6 +67,11 @@ public:
         length++;
     }
 
+    void removeDups() {
+        std::sort(&buffer[0], &buffer[length]);
+        slice(std::unique(&buffer[0], &buffer[length]));
+    }
+
     void slice(T* pos) {
         length = pos - buffer; // Index diff
     }
@@ -78,5 +82,50 @@ public:
 
     void dealloc(void) {
         std::free(buffer);
+    }
+};
+
+template <typename T, size_t fixedLength>
+class IALStaticVector {
+public:
+    T buffer[fixedLength];
+    size_t length;
+
+    IALStaticVector():
+        length(0) {}
+
+    ~IALStaticVector() {}
+
+    constexpr T& at(size_t index) {
+        return buffer[index];
+    }
+
+    constexpr T& operator[](size_t index) {
+        return buffer[index];
+    }
+
+    constexpr size_t size(void) const {
+        return length;
+    }
+
+    constexpr T* begin() {
+        return &buffer[0];
+    }
+
+    constexpr T* end() {
+        return &buffer[length];
+    }
+
+    inline void push_back(T value) {
+        buffer[length] = value;
+        length++;
+    }
+
+    void slice(T* pos) {
+        length = pos - buffer; // Index diff
+    }
+
+    void clear(void) {
+        length = 0;
     }
 };
