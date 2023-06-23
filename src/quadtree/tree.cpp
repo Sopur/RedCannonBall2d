@@ -4,24 +4,24 @@
 #include "child.hpp"
 #include "vec.hpp"
 
-template <size_t QT_MAX_HOLD>
-RedCannonBall::QuadTree<QT_MAX_HOLD>::QuadTree(RedCannonBall::Vector2d dimensions):
+template <int MaxHold>
+RedCannonBall::QuadTree<MaxHold>::QuadTree(RedCannonBall::Vector2d dimensions):
     area(0, 0, dimensions.x, dimensions.y),
     root(area, 0b00) {
 }
 
-template <size_t QT_MAX_HOLD>
-RedCannonBall::QuadTree<QT_MAX_HOLD>::~QuadTree() {
+template <int MaxHold>
+RedCannonBall::QuadTree<MaxHold>::~QuadTree() {
     foundObjs.dealloc();
 }
 
-template <size_t QT_MAX_HOLD>
-void RedCannonBall::QuadTree<QT_MAX_HOLD>::clear(void) {
+template <int MaxHold>
+void RedCannonBall::QuadTree<MaxHold>::clear(void) {
     root.clear();
 }
 
-template <size_t QT_MAX_HOLD>
-void RedCannonBall::QuadTree<QT_MAX_HOLD>::insert(Bound2d bound, QTID id) {
+template <int MaxHold>
+void RedCannonBall::QuadTree<MaxHold>::insert(Bound2d bound, QTID id) {
     if ((bound.x + bound.width) >= area.width || (bound.y + bound.height) >= area.height || (bound.x - bound.width) <= 0 || (bound.y - bound.height) <= 0) {
         std::cerr << "QUADTREE ERROR: Inserting \"" << id << "\" out of bounds: ";
         bound.print();
@@ -33,26 +33,26 @@ void RedCannonBall::QuadTree<QT_MAX_HOLD>::insert(Bound2d bound, QTID id) {
     root.insert(node, matrix);
 }
 
-template <size_t QT_MAX_HOLD>
-void RedCannonBall::QuadTree<QT_MAX_HOLD>::remove(Bound2d location, QTID id) {
+template <int MaxHold>
+void RedCannonBall::QuadTree<MaxHold>::remove(Bound2d location, QTID id) {
     QTMatrix matrix = {0};
     QTNode node = {location, id};
     root.remove(node, matrix);
 }
 
-template <size_t QT_MAX_HOLD>
-void RedCannonBall::QuadTree<QT_MAX_HOLD>::move(Bound2d location, Bound2d newLocation, QTID id) {
+template <int MaxHold>
+void RedCannonBall::QuadTree<MaxHold>::move(Bound2d location, Bound2d newLocation, QTID id) {
     remove(location, id);
     insert(newLocation, id);
 }
 
-template <size_t QT_MAX_HOLD>
-void RedCannonBall::QuadTree<QT_MAX_HOLD>::collisions(std::function<void(IALStaticVector<QTID, QT_MAX_HOLD>& collisions)> callback) {
+template <int MaxHold>
+void RedCannonBall::QuadTree<MaxHold>::collisions(std::function<void(IALStaticVector<QTID, MaxHold>& collisions)> callback) {
     root.collisions(callback);
 }
 
-template <size_t QT_MAX_HOLD>
-IALVector<RedCannonBall::QTID>& RedCannonBall::QuadTree<QT_MAX_HOLD>::get(Bound2d area) {
+template <int MaxHold>
+IALVector<RedCannonBall::QTID>& RedCannonBall::QuadTree<MaxHold>::get(Bound2d area) {
     QTMatrix matrix = {0};
     Box square(area);
     foundObjs.clear();
@@ -61,8 +61,8 @@ IALVector<RedCannonBall::QTID>& RedCannonBall::QuadTree<QT_MAX_HOLD>::get(Bound2
     return foundObjs;
 }
 
-template <size_t QT_MAX_HOLD>
-IALVector<RedCannonBall::QTID>& RedCannonBall::QuadTree<QT_MAX_HOLD>::getAll(void) {
+template <int MaxHold>
+IALVector<RedCannonBall::QTID>& RedCannonBall::QuadTree<MaxHold>::getAll(void) {
     foundObjs.clear();
     root.getAll(foundObjs);
     foundObjs.removeDups();

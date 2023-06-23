@@ -12,7 +12,7 @@
 #define VELOCITY_FLOOR 0.1
 
 RedCannonBall::Engine::Engine(Settings settings):
-    nextID(1),
+    nextID(0),
     tree(Vector2d(1000000)),
     world({settings, {}}),
     collisions(world) {}
@@ -49,9 +49,9 @@ void RedCannonBall::Engine::staticIteration(World* arena) {
     }
 
     tree.collisions([this](IALStaticVector<QTID, 10>& entityIDs) {
-        for (size_t i = 0; i < entityIDs.length; i++) {
+        for (int i = 0; i < entityIDs.length; i++) {
             auto& entityA = world.entities[entityIDs[i]];
-            for (size_t j = 0; j < entityIDs.length; j++) {
+            for (int j = 0; j < entityIDs.length; j++) {
                 if (i == j) continue;
                 auto& entityB = world.entities[entityIDs[j]];
 

@@ -28,6 +28,7 @@ namespace RedCannonBall {
         }
 
         void run(int iterationsPerFrame, int entityDrawLimit, std::function<void()> onFrame) {
+            if (entityDrawLimit == 0) entityDrawLimit = 999999999;
             screen.width = GetScreenWidth();
             screen.height = GetScreenHeight();
             std::cout << "ENGINE: Running " << iterationsPerFrame << " iterations per frame\n";

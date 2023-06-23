@@ -61,10 +61,11 @@ public:
         return &buffer[length];
     }
 
-    inline void push_back(T value) {
+    inline size_t push_back(T value) {
         if (length == trueSize) reallign();
         buffer[length] = value;
         length++;
+        return length - 1;
     }
 
     void removeDups() {
@@ -89,7 +90,7 @@ template <typename T, size_t fixedLength>
 class IALStaticVector {
 public:
     T buffer[fixedLength];
-    size_t length;
+    unsigned int length;
 
     IALStaticVector():
         length(0) {}

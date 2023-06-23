@@ -11,7 +11,7 @@
 namespace RedCannonBall {
     class Line;
 
-    typedef double PhysAttr;
+    typedef float PhysAttr;
     typedef unsigned long PhysID;
     typedef std::vector<Line> Mesh;
 

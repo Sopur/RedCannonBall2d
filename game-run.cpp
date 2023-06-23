@@ -17,7 +17,7 @@ double random(double min, double max) {
 }
 
 int main() {
-    RedCannonBall::Renderer engine("Physics sim", 600, 600, {0, timeStep}, RedCannonBall::Vector2d(0), 0.1);
+    RedCannonBall::Renderer engine("Physics sim", 800, 800, {1, timeStep}, RedCannonBall::Vector2d(0), 0.01);
     // engine.engine.insertEntity(RedCannonBall::EntityGen::invPolygon(11, 200), {0, -300}, 999, 9999, 0.5, 0.01);
 
     // for (int i = 0; i < 1; i++) {
@@ -26,15 +26,15 @@ int main() {
     // engine.engine.insertEntity(RedCannonBall::Circle(0, 0, 30), 10, 1, 0.5, 0.01);
     //  engine.engine.insertEntity(RedCannonBall::EntityGen::invPolygon(5, 200), {0, 0}, 9999, 9999, 0.01, 0.01);
     // engine.engine.insertEntity(RedCannonBall::EntityGen::polygon(6, 700), {0, 0}, 0, 10, 0.5, 0.01);
-    engine.engine.insertEntity(RedCannonBall::Circle(0, 0, 3000), 100, 10, 1, 0.1);
+    engine.engine.insertEntity(RedCannonBall::Circle(0, 21000, 20000), 0, 10, 1, 0.1);
 
     for (int i = 0; i < 10000; i++) {
-        engine.engine.insertEntity(RedCannonBall::Circle(random(-90000, 90000), random(-90000, 90000), random(100, 200)), 10, 10, 1, 0.1);
+        engine.engine.insertEntity(RedCannonBall::Circle(random(-10000, 10000), random(-400000, -300), random(100, 200)), 5, 10, 1, 0.1);
     }
 
     // engine.engine.insertEntity(RedCannonBall::EntityGen::polygon(10, 10), {0, 300}, 10, 0.5, 1, 0.1);
 
-    engine.run(int(1 / timeStep), 99999, [&engine] {
+    engine.run(int(1 / timeStep), 0, [&engine] {
         auto adjustment = (GetMouseWheelMove() * zoomSpeed);
         if ((engine.fov + adjustment) > 0) {
             engine.fov += adjustment;
@@ -51,6 +51,6 @@ int main() {
         if (IsKeyDown(KEY_UP)) player.force.y -= movementSpeed;
         if (IsKeyDown(KEY_DOWN)) player.force.y += movementSpeed;
 
-        engine.camera.lerpTo(player, 0.05);
+        // engine.camera.lerpTo(player, 0.05);
     });
 }
